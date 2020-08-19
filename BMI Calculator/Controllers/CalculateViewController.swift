@@ -10,6 +10,8 @@ import UIKit
 
 class CalculateViewController: UIViewController {
 
+    var calculatorBrain = CalculatorBrain()
+    
     @IBOutlet weak var heightLabel: UILabel!
     @IBOutlet weak var weightLabel: UILabel!
     @IBOutlet weak var heightSlider: UISlider!
@@ -28,13 +30,23 @@ class CalculateViewController: UIViewController {
         weightLabel.text = "\(weight)Kg"
     }
     @IBAction func calculatePressed(_ sender: UIButton) {
-        let BMI = weightSlider.value / (heightSlider.value * heightSlider.value)
-        print("BMI = \(BMI)")
         
-        let secondVC = SecondViewController()
-        secondVC.bmiValue = String(format: "%.0f", BMI)
         
-        self.present(secondVC, animated: true, completion: nil)
+        calculatorBrain.calculateBMI(height: heightSlider.value, weight: weightSlider.value)
+        
+        self.performSegue(withIdentifier: "goToResult", sender: self)
+    }
+    
+    // MARK: - Navigation
+
+    // In a storyboard-based application, you will often want to do a little preparation before navigation
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if (segue.identifier == "goToResult") {
+            let destinationVC = segue.destination as! ResultViewController
+            destinationVC.bmiValue = calculatorBrain.getBMIValue()
+            destinationVC.advice = calculatorBrain.getAdvice()
+            destinationVC.color = calculatorBrain.getColor()
+        }
     }
 }
 
